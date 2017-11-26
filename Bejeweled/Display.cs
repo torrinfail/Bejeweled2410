@@ -37,11 +37,7 @@ namespace Bejeweled
         /// </summary>
         protected override void Initialize()
         {
-            swappableGems = new List<Gem>(4);
-            swappableGems.Add(null);
-            swappableGems.Add(null);
-            swappableGems.Add(null);
-            swappableGems.Add(null);
+			swappableGems = new List<Gem>(4);
             IsMouseVisible = true;
             // TODO: Add your initialization logic here
             gemTexture = Content.Load<Texture2D>("Ball");
@@ -145,19 +141,33 @@ namespace Bejeweled
             if (mouseRect.Intersects(selectionRect))
             {
                 selectedRect = selectionRect;
+				var lastGem = Gem.selectedGem;
                 Gem.selectedGem = gems[selectedRect.Value.Y / 48, selectedRect.Value.X / 48];
-                try
-                {
-                    swappableGems[0] = gems[(selectedRect.Value.Y / 48) - 1, (selectedRect.Value.X / 48)];
-                    swappableGems[1] = gems[(selectedRect.Value.Y / 48) + 1, (selectedRect.Value.X / 48)];
-                    swappableGems[2] = gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) - 1];
-                    swappableGems[3] = gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) + 1];
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.StackTrace);
-                }
+				if (swappableGems.Contains(Gem.selectedGem))
+				{
+					Gem.SwapGems(Gem.selectedGem, lastGem);
+					swappableGems.Clear();
+					return;
+				}
+				swappableGems.Clear();
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48) - 1, (selectedRect.Value.X / 48)]));
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48) + 1, (selectedRect.Value.X / 48)]));
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) - 1]));
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) + 1]));
             }
         }
+		void TrySelect(Action tryAction)
+		{
+			try
+			{
+				tryAction();
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine(e.StackTrace);
+			}
+
+		}
+
     }
 }

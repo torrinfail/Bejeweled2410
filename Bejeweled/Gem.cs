@@ -9,9 +9,9 @@ namespace Bejeweled
 {
     class Gem
     {
-        static Color[] colors = new[] { Color.Red, Color.Blue, Color.Orange, Color.Green };
+        static Color[] colors = { Color.Red, Color.Blue, Color.Orange, Color.Green };
         public static Gem selectedGem;
-        public Color Color { get; }
+		public Color Color { get; private set;}
         public Rectangle Rect { get; }
         //public Vector2 Position { get; }
         public Gem(int color,Rectangle rect)
@@ -20,11 +20,12 @@ namespace Bejeweled
             this.Rect = rect;
         }
 
-        static void SwapGems(ref Gem gem1,ref Gem gem2)
+        public static void SwapGems(Gem gem1,Gem gem2)
         {
-            Gem tempGem = gem1;
-            gem1 = gem2;
-            gem2 = tempGem;
+			//Gem tempGem = gem1;
+			var tempColor = gem1.Color;
+			gem1.Color = gem2.Color;
+			gem2.Color = tempColor;
         }
         
     }
