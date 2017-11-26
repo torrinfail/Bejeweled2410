@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using System;
+using System.Collections.Generic;
 namespace Bejeweled
 {
+    public delegate void MouseHandler();
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -11,7 +14,15 @@ namespace Bejeweled
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        
+        Texture2D gemTexture, square;
+        Rectangle selectionRect, mouseRect;
+        Rectangle? selectedRect;
+        Gem[,] gems = new Gem[8,8];
+        IList<Gem> swappableGems;
+        Random random = new Random();
+        MouseState currentMouseState, lastMouseState;
+        public MouseHandler OnLeftClick { get; private set; }
+        bool clickOccurred;
         public Display()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -26,8 +37,22 @@ namespace Bejeweled
         /// </summary>
         protected override void Initialize()
         {
+            swappableGems = new List<Gem>(4);
+            swappableGems.Add(null);
+            swappableGems.Add(null);
+            swappableGems.Add(null);
+            swappableGems.Add(null);
+            IsMouseVisible = true;
             // TODO: Add your initialization logic here
-
+            gemTexture = Content.Load<Texture2D>("Ball");
+            square = Content.Load<Texture2D>("Sqaure");
+            
+            for (int i = 0; i < gems.GetLength(0); i++)
+                for (int j = 0; j < gems.GetLength(1); j++)
+                {
+                    gems[i, j] = new Gem(random.Next(4), new Rectangle(j * 48, i * 48, 48, 48));
+                }
+            OnLeftClick += GemSelectionHandler;
             base.Initialize();
         }
 
@@ -59,8 +84,22 @@ namespace Bejeweled
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            // The active state from the last frame is now old
+            lastMouseState = currentMouseState;
+
+            // Get the mouse state relevant for this frame
+            currentMouseState = Mouse.GetState();
+
+            mouseRect = new Rectangle(Mouse.GetState().Position, new Point(1, 1));
+
+            // Recognize a single click of the left mouse button
+            if (lastMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
+            {
+                OnLeftClick();
+            }
+
+            
+            
 
             // TODO: Add your update logic here
 
@@ -75,9 +114,50 @@ namespace Bejeweled
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            spriteBatch.Begin();
+            spriteBatch.Draw(square, selectionRect, Color.Yellow);
+            foreach(var current in gems)
+            {
+                if(mouseRect.Intersects(current.Rect))
+                {
+                    selectionRect = current.Rect;
+                }
+                if(current == Gem.selectedGem)
+                {
+                    spriteBatch.Draw(square, current.Rect, Color.Red);
+                }
+                else if(swappableGems.Contains(current))
+                {
+                    spriteBatch.Draw(square, current.Rect, Color.Red);
+                }
+                spriteBatch.Draw(gemTexture, current.Rect, current.Color);
+            }
+            
+            spriteBatch.End();
+
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        void GemSelectionHandler()
+        {
+            if (mouseRect.Intersects(selectionRect))
+            {
+                selectedRect = selectionRect;
+                Gem.selectedGem = gems[selectedRect.Value.Y / 48, selectedRect.Value.X / 48];
+                try
+                {
+                    swappableGems[0] = gems[(selectedRect.Value.Y / 48) - 1, (selectedRect.Value.X / 48)];
+                    swappableGems[1] = gems[(selectedRect.Value.Y / 48) + 1, (selectedRect.Value.X / 48)];
+                    swappableGems[2] = gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) - 1];
+                    swappableGems[3] = gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) + 1];
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
+            }
         }
     }
 }
