@@ -9,14 +9,14 @@ namespace Bejeweled
 {
     class Gem
     {
-        static Color[] colors = { Color.Red, Color.Blue, Color.Orange, Color.Green };
+        //static Color[] colors = { Color.Red, Color.Blue, Color.Orange, Color.Green };
         public static Gem selectedGem;
-		public Color Color { get; private set;}
+		public int Color { get; private set;}
         public Rectangle Rect { get; }
         //public Vector2 Position { get; }
         public Gem(int color,Rectangle rect)
         {
-            this.Color = colors[color];
+            this.Color = color;
             this.Rect = rect;
         }
 

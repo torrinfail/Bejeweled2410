@@ -15,6 +15,7 @@ namespace Bejeweled
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D gemTexture, square;
+        Texture2D[] gemTextures = new Texture2D[7];
         Rectangle selectionRect, mouseRect;
         Rectangle? selectedRect;
         Gem[,] gems = new Gem[8,8];
@@ -40,13 +41,21 @@ namespace Bejeweled
 			swappableGems = new List<Gem>(4);
             IsMouseVisible = true;
             // TODO: Add your initialization logic here
-            gemTexture = Content.Load<Texture2D>("Ball");
+            //gemTexture = Content.Load<Texture2D>("Ball");
             square = Content.Load<Texture2D>("Sqaure");
-            
+            gemTextures[0] = Content.Load<Texture2D>("purpleicon");
+            gemTextures[1] = Content.Load<Texture2D>("orangeicon");
+            gemTextures[2] = Content.Load<Texture2D>("redicon");
+            gemTextures[3] = Content.Load<Texture2D>("greenicon");
+            gemTextures[4] = Content.Load<Texture2D>("grayicon");
+            gemTextures[5] = Content.Load<Texture2D>("yellowicon");
+            gemTextures[6] = Content.Load<Texture2D>("blueicon");
+
+
             for (int i = 0; i < gems.GetLength(0); i++)
                 for (int j = 0; j < gems.GetLength(1); j++)
                 {
-                    gems[i, j] = new Gem(random.Next(4), new Rectangle(j * 48, i * 48, 48, 48));
+                    gems[i, j] = new Gem(random.Next(7), new Rectangle(j * 48, i * 48, 48, 48));
                 }
             OnLeftClick += GemSelectionHandler;
             base.Initialize();
@@ -112,21 +121,25 @@ namespace Bejeweled
 
             spriteBatch.Begin();
             spriteBatch.Draw(square, selectionRect, Color.Yellow);
+            var color = Color.White;
             foreach(var current in gems)
             {
+                color = Color.White;
                 if(mouseRect.Intersects(current.Rect))
                 {
                     selectionRect = current.Rect;
                 }
                 if(current == Gem.selectedGem)
                 {
-                    spriteBatch.Draw(square, current.Rect, Color.Red);
+                    //spriteBatch.Draw(square, current.Rect, Color.Red);
+                    color = Color.Gray;
                 }
                 else if(swappableGems.Contains(current))
                 {
-                    spriteBatch.Draw(square, current.Rect, Color.Red);
+                    //spriteBatch.Draw(square, current.Rect, Color.Red);
+                    color = Color.DeepPink;
                 }
-                spriteBatch.Draw(gemTexture, current.Rect, current.Color);
+                spriteBatch.Draw(gemTextures[current.Color], current.Rect,color);
             }
             
             spriteBatch.End();
