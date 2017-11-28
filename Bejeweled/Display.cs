@@ -131,13 +131,13 @@ namespace Bejeweled
                 }
                 if(current == Gem.selectedGem)
                 {
-                    //spriteBatch.Draw(square, current.Rect, Color.Red);
-                    color = Color.Gray;
+                    spriteBatch.Draw(square, current.Rect, Color.Red);
+                    //color = Color.Gray;
                 }
                 else if(swappableGems.Contains(current))
                 {
-                    //spriteBatch.Draw(square, current.Rect, Color.Red);
-                    color = Color.DeepPink;
+                    spriteBatch.Draw(square, current.Rect, Color.Red);
+                    //color = Color.DeepPink;
                 }
                 spriteBatch.Draw(gemTextures[current.Color], current.Rect,color);
             }
@@ -171,14 +171,11 @@ namespace Bejeweled
         }
 		void TrySelect(Action tryAction)
 		{
-			try
-			{
-				tryAction();
-			}
-			catch(Exception e)
-			{
-				Console.WriteLine(e.StackTrace);
-			}
+            try
+            {
+                tryAction();
+            }
+            catch (Exception) { }
 
 		}
 
