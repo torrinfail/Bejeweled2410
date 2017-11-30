@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Display.cs" />
     <Compile Include="Gem.cs" />
+    <Compile Include="MatchCheck.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -155,7 +155,6 @@ namespace Bejeweled
             spriteBatch.End();
 
             // TODO: Add your drawing code here
-
             base.Draw(gameTime);
         }
 
@@ -178,6 +177,7 @@ namespace Bejeweled
 				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / size), (selectedRect.Value.X / size) - 1]));
 				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / size), (selectedRect.Value.X / size) + 1]));
             }
+            new MatchCheck().CheckWin(gems).ToString();
         }
 		void TrySelect(Action tryAction)
 		{
