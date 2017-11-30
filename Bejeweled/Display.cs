@@ -14,7 +14,8 @@ namespace Bejeweled
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D gemTexture, square;
+        SpriteFont font;
+        Texture2D gemTexture, square, background;
         Texture2D[] gemTextures = new Texture2D[7];
         Rectangle selectionRect, mouseRect;
         Rectangle? selectedRect;
@@ -22,8 +23,8 @@ namespace Bejeweled
         IList<Gem> swappableGems;
         Random random = new Random();
         MouseState currentMouseState, lastMouseState;
+        int size, score;
         public MouseHandler OnLeftClick { get; private set; }
-        bool clickOccurred;
         public Display()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -40,9 +41,14 @@ namespace Bejeweled
         {
 			swappableGems = new List<Gem>(4);
             IsMouseVisible = true;
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/2;  // set this value to the desired width of your window
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height/2;   // set this value to the desired height of your window
+            size = graphics.PreferredBackBufferHeight / 8;
+            graphics.ApplyChanges();
             // TODO: Add your initialization logic here
             //gemTexture = Content.Load<Texture2D>("Ball");
             square = Content.Load<Texture2D>("Sqaure");
+            background = Content.Load<Texture2D>("galaxy");
             gemTextures[0] = Content.Load<Texture2D>("purpleicon");
             gemTextures[1] = Content.Load<Texture2D>("orangeicon");
             gemTextures[2] = Content.Load<Texture2D>("redicon");
@@ -50,12 +56,13 @@ namespace Bejeweled
             gemTextures[4] = Content.Load<Texture2D>("grayicon");
             gemTextures[5] = Content.Load<Texture2D>("yellowicon");
             gemTextures[6] = Content.Load<Texture2D>("blueicon");
+            font = Content.Load<SpriteFont>("Courier New");
 
 
             for (int i = 0; i < gems.GetLength(0); i++)
                 for (int j = 0; j < gems.GetLength(1); j++)
                 {
-                    gems[i, j] = new Gem(random.Next(7), new Rectangle(j * 48, i * 48, 48, 48));
+                    gems[i, j] = new Gem(random.Next(7), new Rectangle(j * size, i * size, size, size));
                 }
             OnLeftClick += GemSelectionHandler;
             base.Initialize();
@@ -118,8 +125,11 @@ namespace Bejeweled
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
             spriteBatch.Begin();
+            
+            spriteBatch.Draw(background, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
+            spriteBatch.DrawString(font, $"SCORE: {score}", new Vector2(size * 9, 0), Color.White);
+            
             spriteBatch.Draw(square, selectionRect, Color.Yellow);
             var color = Color.White;
             foreach(var current in gems)
@@ -155,7 +165,7 @@ namespace Bejeweled
             {
                 selectedRect = selectionRect;
 				var lastGem = Gem.selectedGem;
-                Gem.selectedGem = gems[selectedRect.Value.Y / 48, selectedRect.Value.X / 48];
+                Gem.selectedGem = gems[selectedRect.Value.Y / size, selectedRect.Value.X / size];
 				if (swappableGems.Contains(Gem.selectedGem))
 				{
 					Gem.SwapGems(Gem.selectedGem, lastGem);
@@ -163,10 +173,10 @@ namespace Bejeweled
 					return;
 				}
 				swappableGems.Clear();
-				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48) - 1, (selectedRect.Value.X / 48)]));
-				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48) + 1, (selectedRect.Value.X / 48)]));
-				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) - 1]));
-				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / 48), (selectedRect.Value.X / 48) + 1]));
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / size) - 1, (selectedRect.Value.X / size)]));
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / size) + 1, (selectedRect.Value.X / size)]));
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / size), (selectedRect.Value.X / size) - 1]));
+				TrySelect(() => swappableGems.Add(gems[(selectedRect.Value.Y / size), (selectedRect.Value.X / size) + 1]));
             }
         }
 		void TrySelect(Action tryAction)
