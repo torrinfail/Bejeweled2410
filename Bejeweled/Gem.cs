@@ -9,11 +9,20 @@ namespace Bejeweled
 {
     class Gem
     {
-        //static Color[] colors = { Color.Red, Color.Blue, Color.Orange, Color.Green };
+        static Random random = new Random();
         public static Gem selectedGem;
 		public int Color { get; private set;}
         public Rectangle Rect { get; }
-        //public Vector2 Position { get; }
+        public Gem(Rectangle rect)
+        {
+            Color = random.Next(7);
+            Rect = rect;
+        }
+
+        public void SetNewColor()
+        {
+            Color = random.Next(7);
+        }
         public Gem(int color,Rectangle rect)
         {
             this.Color = color;
