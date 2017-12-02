@@ -37,7 +37,7 @@ namespace Bejeweled
 
         GameLogic()
         {
-            
+
         }
 
         public void Initialze()
@@ -69,7 +69,7 @@ namespace Bejeweled
                             if (i - 3 >= 0 && gem[i - 3, j].Color == gemAt)
                             {
                                 Score += score4; //or add 5 for a bonus point for four in a row
-                                _gems[i-3, j].SetNewColor();
+                                _gems[i - 3, j].SetNewColor();
                             }
                             //if these are all the same player then updates score 3 points (one for each gem)
                             _gems[i - 1, j].SetNewColor();
@@ -77,23 +77,22 @@ namespace Bejeweled
                             _gems[i, j].SetNewColor();
                             Score += score3;
                         }
-
-                        if (j - 2 >= 0) //going horizontal
+                    }
+                    if (j - 2 >= 0) //going horizontal
+                    {
+                        if (gem[i, j - 1].Color == gemAt && gem[i, j - 2].Color == gemAt)
                         {
-                            if (gem[i, j - 1].Color == gemAt && gem[i, j - 2].Color == gemAt)
+                            if (j - 3 >= 0 && gem[i, j - 3].Color == gemAt)
                             {
-                                if (j - 3 >= 0 && gem[i, j - 3].Color == gemAt)
-                                {
-                                    _gems[i, j - 3].SetNewColor();
-                                    Score += score4;
-                                }
-                                //if these are all the same player then win
-
-                                _gems[i, j - 2].SetNewColor();
-                                _gems[i, j-1].SetNewColor();
-                                _gems[i, j].SetNewColor();
-                                Score += score3;
+                                _gems[i, j - 3].SetNewColor();
+                                Score += score4;
                             }
+                            //if these are all the same player then win
+
+                            _gems[i, j - 2].SetNewColor();
+                            _gems[i, j - 1].SetNewColor();
+                            _gems[i, j].SetNewColor();
+                            Score += score3;
                         }
                     }
                 }
@@ -101,3 +100,4 @@ namespace Bejeweled
         }
     }
 }
+

@@ -69,8 +69,6 @@ namespace Bejeweled
             graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height/2;   // set this value to the desired height of your window
             Size = graphics.PreferredBackBufferHeight / 8;
             graphics.ApplyChanges();
-            // TODO: Add your initialization logic here
-            //gemTexture = Content.Load<Texture2D>("Ball");
             square = Content.Load<Texture2D>("Sqaure");
             background = Content.Load<Texture2D>("galaxy");
             gemTextures[0] = Content.Load<Texture2D>("purpleicon");
@@ -99,16 +97,6 @@ namespace Bejeweled
 
             // TODO: use this.Content to load your game content here
         }
-
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
-
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -129,12 +117,6 @@ namespace Bejeweled
             {
                 OnLeftClick();
             }
-
-            
-            
-
-            // TODO: Add your update logic here
-
             base.Update(gameTime);
         }
 
@@ -148,7 +130,7 @@ namespace Bejeweled
             spriteBatch.Begin();
             
             spriteBatch.Draw(background, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
-            spriteBatch.DrawString(font, $"SCORE: {Score}", new Vector2(Size * 9, 0), Color.White);
+            spriteBatch.DrawString(font, $"SCORE: {Score}", new Vector2(Size * 8, 0), Color.White);
             
             spriteBatch.Draw(square, selectionRect, Color.Yellow);
             var color = Color.White;
@@ -178,7 +160,7 @@ namespace Bejeweled
             base.Draw(gameTime);
         }
 
-        void GemSelectionHandler()
+        void GemSelectionHandler() //called by OnLeftClick()
         {
             if (mouseRect.Intersects(selectionRect))
             {
