@@ -78,7 +78,7 @@ namespace Bejeweled
             gemTextures[4] = Content.Load<Texture2D>("grayicon");
             gemTextures[5] = Content.Load<Texture2D>("yellowicon");
             gemTextures[6] = Content.Load<Texture2D>("blueicon");
-            font = Content.Load<SpriteFont>("Courier New");
+            //font = Content.Load<SpriteFont>("Courier New");
 
             GameLogic.Instance.Initialze();
             
@@ -130,8 +130,8 @@ namespace Bejeweled
             spriteBatch.Begin();
             
             spriteBatch.Draw(background, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
-            spriteBatch.DrawString(font, $"SCORE: {Score}", new Vector2(Size * 8, 0), Color.White);
-            
+            //spriteBatch.DrawString(font, $"SCORE: {Score}", new Vector2(Size * 8, 0), Color.White);
+            //Console.WriteLine($"Score: {Score}");
             spriteBatch.Draw(square, selectionRect, Color.Yellow);
             var color = Color.White;
             foreach(var current in Gems)

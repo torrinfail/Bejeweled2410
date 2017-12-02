@@ -96,6 +96,7 @@ namespace Bejeweled
                         }
                     }
                 }
+                Console.WriteLine($"Score: {Score}");
             }
         }
     }
