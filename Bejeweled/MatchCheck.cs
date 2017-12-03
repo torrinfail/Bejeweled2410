@@ -51,8 +51,10 @@ namespace Bejeweled
             Score = 0;
         }
 
-        public void CheckWin(Gem[,] gem)
+        public int CheckWin(Gem[,] gem)
         {
+            int matchesFound = 0;
+            var dropGems = new List<Gem>();
             int score3 = 3;
             int score4 = 4;
             for (int i = 7; i >= 0; i--) //rows
@@ -69,12 +71,14 @@ namespace Bejeweled
                             if (i - 3 >= 0 && gem[i - 3, j].Color == gemAt)
                             {
                                 Score += score4; //or add 5 for a bonus point for four in a row
-                                _gems[i - 3, j].SetNewColor();
+                                _gems[i - 3, j].SetNewColor(8);
                             }
                             //if these are all the same player then updates score 3 points (one for each gem)
-                            _gems[i - 1, j].SetNewColor();
-                            _gems[i - 2, j].SetNewColor();
-                            _gems[i, j].SetNewColor();
+                            _gems[i, j].SetNewColor(_gems[i - 1, j].SetNewColor(_gems[i - 2, j].SetNewColor(8)));
+                            matchesFound++;
+                            //dropGems.Add(_gems[i, j]);
+                            //dropGems.Add(_gems[i - 1, j]);
+                            //dropGems.Add(_gems[i - 2, j]);
                             Score += score3;
                         }
                     }
@@ -84,19 +88,51 @@ namespace Bejeweled
                         {
                             if (j - 3 >= 0 && gem[i, j - 3].Color == gemAt)
                             {
-                                _gems[i, j - 3].SetNewColor();
+                                _gems[i, j - 3].SetNewColor(8);
                                 Score += score4;
                             }
                             //if these are all the same player then win
 
-                            _gems[i, j - 2].SetNewColor();
-                            _gems[i, j - 1].SetNewColor();
-                            _gems[i, j].SetNewColor();
+                           
+                            _gems[i, j].SetNewColor(_gems[i, j - 1].SetNewColor(_gems[i, j - 2].SetNewColor(8)));
+                            matchesFound++;
+                            //dropGems.Add(_gems[i, j]);
+                            //dropGems.Add(_gems[i, j - 1]);
+                            //dropGems.Add(_gems[i, j - 2]);
                             Score += score3;
                         }
                     }
                 }
-                Console.WriteLine($"Score: {Score}");
+            }
+            if (matchesFound > 0)
+                return CheckWin(gem);
+            Console.WriteLine($"Score: {Score}");
+            return matchesFound;
+        }
+
+        void DropOneDown(IList<Gem> dropGems)
+        {
+            int current = 0;
+            for (int i = 7; i >= 0; i--) //rows
+            {
+                for (int j = 7; j >= 0; j--) //columns
+                {
+                    if (Gems[i, j].Equals(dropGems[current]))
+                    {
+                        try
+                        {
+                            Gems[i, j].Color = Gems[i - 1, j].Color;
+                            Gems[i - 1, j].SetNewColor(2);
+
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            Gems[i, j].SetNewColor(2);
+
+                            i++;
+                        }
+                    }
+                }
             }
         }
     }

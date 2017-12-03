@@ -11,7 +11,22 @@ namespace Bejeweled
     {
         static Random random = new Random();
         public static Gem selectedGem;
-		public int Color { get; private set;}
+        int _color;
+		public int Color {
+            get
+            {
+                return _color;
+            }
+            set
+            {
+                if (value > -1 && value < 8)
+                {
+                    _color = value;
+                }
+                else
+                    throw new InvalidOperationException("Needs to be less than 8 or greater than -1");
+            }
+        }
         public Rectangle Rect { get; }
         public Gem(Rectangle rect)
         {
@@ -19,9 +34,17 @@ namespace Bejeweled
             Rect = rect;
         }
 
-        public void SetNewColor()
+        public int SetNewColor(int excludedColor)
         {
-            Color = random.Next(7);
+            var newColor = random.Next(7);
+            var oldColor = Color;
+            
+            if(newColor.Equals(oldColor) || newColor.Equals(excludedColor))
+            {
+                return SetNewColor(excludedColor);
+            }
+            Color = newColor;
+            return newColor;
         }
         public Gem(int color,Rectangle rect)
         {
