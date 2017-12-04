@@ -107,6 +107,10 @@ namespace Bejeweled
             if (matchesFound > 0)
                 return CheckWin(gem);
             Console.WriteLine($"Score: {Score}");
+
+            FileIO fileio = new FileIO();
+            fileio.WriteScoreToFile(Score);
+
             return matchesFound;
         }
 
