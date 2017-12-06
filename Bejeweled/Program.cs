@@ -3,7 +3,7 @@
 namespace Bejeweled
 {
     /// <summary>
-    /// The main class.
+    /// The main class, Autocreated By XNA.
     /// </summary>
     public static class Program
     {

@@ -2,22 +2,26 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Windows.Forms;
 using System.Collections.Generic;
 namespace Bejeweled
 {
     public delegate void MouseHandler();
 
     /// <summary>
-    /// This is the main type for your game.
+    /// Author: Aidan Hubert
+    /// This class handles all the display and updating for the game
     /// </summary>
     public class Display : Game
     {
+        IEnumerable<int> previousScores;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SpriteFont font;
-        Texture2D gemTexture, square, background;
+        Texture2D square, background,scoreIcon;
         Texture2D[] gemTextures = new Texture2D[7];
-        Rectangle selectionRect, mouseRect;
+        Rectangle selectionRect, mouseRect,scoreIconRect;
+        Vector2 scoreVect;
         Rectangle? selectedRect;
         
         Gem[,] Gems
@@ -48,7 +52,14 @@ namespace Bejeweled
                 return GameLogic.Instance.Score;
             }
         }
+        int highScore;
+        /// <summary>
+        /// called when the left mouse button is clicked
+        /// </summary>
         public MouseHandler OnLeftClick { get; private set; }
+        /// <summary>
+        /// Creates the main display for the game
+        /// </summary>
         public Display()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -64,11 +75,13 @@ namespace Bejeweled
         protected override void Initialize()
         {
 			swappableGems = new List<Gem>(4);
+            //recentlyMatchedGems = new List<Gem>(4);
             IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/2;  // set this value to the desired width of your window
             graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height/2;   // set this value to the desired height of your window
             Size = graphics.PreferredBackBufferHeight / 8;
             graphics.ApplyChanges();
+            scoreIcon = Content.Load<Texture2D>("score");
             square = Content.Load<Texture2D>("Sqaure");
             background = Content.Load<Texture2D>("galaxy");
             gemTextures[0] = Content.Load<Texture2D>("purpleicon");
@@ -78,11 +91,14 @@ namespace Bejeweled
             gemTextures[4] = Content.Load<Texture2D>("grayicon");
             gemTextures[5] = Content.Load<Texture2D>("yellowicon");
             gemTextures[6] = Content.Load<Texture2D>("blueicon");
-            //font = Content.Load<SpriteFont>("Courier New");
-
+            font = Content.Load<SpriteFont>("Courier New");
+            scoreIconRect = new Rectangle(Size * 8, 0, Size * 5, Size*4);
+            scoreVect = new Vector2(Size * 11, Size *3);
             GameLogic.Instance.Initialze();
-            
+            previousScores = FileIO.GetScores();
+            highScore = FileIO.HighScore;
             OnLeftClick += GemSelectionHandler;
+            Window.Title = $"Bejeweled     HighScore: {highScore}";
             base.Initialize();
         }
 
@@ -96,6 +112,16 @@ namespace Bejeweled
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+        }
+        /// <summary>
+        /// Called when game is closing to unload extra content. also writes score to file
+        /// </summary>
+        protected override void UnloadContent()
+        {
+            FileIO.WriteScoreToFile(Score);
+            MessageBox.Show((Score > highScore ? "You have set a new high score!" : $"Your Score: {Score} is not as high as the High Score: {highScore}") + 
+                "\nThanks For Playing!");
+            base.UnloadContent();
         }
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -113,9 +139,13 @@ namespace Bejeweled
             mouseRect = new Rectangle(Mouse.GetState().Position, new Point(1, 1));
 
             // Recognize a single click of the left mouse button
-            if (lastMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
+            if (lastMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && currentMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
             {
                 OnLeftClick();
+            }
+            for (int i = 0; i < Timer.Timers.Count; i++)
+            {
+                Timer.Timers[i].Update(gameTime);
             }
             base.Update(gameTime);
         }
@@ -129,9 +159,9 @@ namespace Bejeweled
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
             
-            spriteBatch.Draw(background, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
-            //spriteBatch.DrawString(font, $"SCORE: {Score}", new Vector2(Size * 8, 0), Color.White);
-            //Console.WriteLine($"Score: {Score}");
+            spriteBatch.Draw(background, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.Gray);
+            spriteBatch.Draw(scoreIcon, scoreIconRect, Color.White);
+            spriteBatch.DrawString(font, $"{Score}", scoreVect, Color.White);
             spriteBatch.Draw(square, selectionRect, Color.Yellow);
             var color = Color.White;
             foreach(var current in Gems)
@@ -150,6 +180,11 @@ namespace Bejeweled
                 {
                     spriteBatch.Draw(square, current.Rect, Color.Red);
                     //color = Color.DeepPink;
+                }
+                if(current.RecentlyMatched)
+                {
+                    spriteBatch.Draw(square, current.Rect, Color.Purple);
+                    //recentlyMatchedGems.Add(current);
                 }
                 spriteBatch.Draw(gemTextures[current.Color], current.Rect,color);
             }

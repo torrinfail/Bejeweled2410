@@ -7,10 +7,18 @@ using System.Threading.Tasks;
 
 namespace Bejeweled
 {
+    /// <summary>
+    /// Author: Aidan Hubert
+    /// Author: Chloe Bleak
+    /// this class handles the main logic for finding matches and keeping score for the game
+    /// </summary>
     class GameLogic
     {
         static Random random = new Random();
         static GameLogic _instance;
+        /// <summary>
+        /// Returns the singleton instance of this class as there can only be one
+        /// </summary>
         public static GameLogic Instance
         {
             get
@@ -18,8 +26,14 @@ namespace Bejeweled
                 return _instance;
             }
         }
+        /// <summary>
+        /// The players score
+        /// </summary>
         public int Score { get; private set; }
         Gem[,] _gems = new Gem[8, 8];
+        /// <summary>
+        /// represents all the gems on the board
+        /// </summary>
         public Gem[,] Gems
         {
             get
@@ -27,7 +41,9 @@ namespace Bejeweled
                 return _gems;
             }
         }
-
+        /// <summary>
+        /// the size of elements on the screen
+        /// </summary>
         public int Size { get; set; }
 
         static GameLogic()
@@ -35,11 +51,11 @@ namespace Bejeweled
             _instance = new GameLogic();
         }
 
-        GameLogic()
-        {
+        GameLogic() { } //prevents instantiation
 
-        }
-
+        /// <summary>
+        /// Initializes all fields
+        /// </summary>
         public void Initialze()
         {
             for (int i = 0; i < Gems.GetLength(0); i++)
@@ -50,7 +66,9 @@ namespace Bejeweled
             CheckWin(_gems);
             Score = 0;
         }
-
+        /// <summary>
+        /// Checks all gems for matches recursively until all matches have been found
+        /// </summary>
         public int CheckWin(Gem[,] gem)
         {
             int matchesFound = 0;
@@ -72,13 +90,15 @@ namespace Bejeweled
                             {
                                 Score += score4; //or add 5 for a bonus point for four in a row
                                 _gems[i - 3, j].SetNewColor(8);
+                                _gems[i-3, j].RecentlyMatched = true;
                             }
                             //if these are all the same player then updates score 3 points (one for each gem)
                             _gems[i, j].SetNewColor(_gems[i - 1, j].SetNewColor(_gems[i - 2, j].SetNewColor(8)));
+                            _gems[i, j].RecentlyMatched = true;
+                            _gems[i-1, j].RecentlyMatched = true;
+                            _gems[i-2, j].RecentlyMatched = true;
                             matchesFound++;
-                            //dropGems.Add(_gems[i, j]);
-                            //dropGems.Add(_gems[i - 1, j]);
-                            //dropGems.Add(_gems[i - 2, j]);
+                          
                             Score += score3;
                         }
                     }
@@ -89,16 +109,18 @@ namespace Bejeweled
                             if (j - 3 >= 0 && gem[i, j - 3].Color == gemAt)
                             {
                                 _gems[i, j - 3].SetNewColor(8);
+                                _gems[i, j-3].RecentlyMatched = true;
                                 Score += score4;
                             }
                             //if these are all the same player then win
 
                            
                             _gems[i, j].SetNewColor(_gems[i, j - 1].SetNewColor(_gems[i, j - 2].SetNewColor(8)));
+                            _gems[i, j].RecentlyMatched = true;
+                            _gems[i, j-2].RecentlyMatched = true;
+                            _gems[i, j-1].RecentlyMatched = true;
                             matchesFound++;
-                            //dropGems.Add(_gems[i, j]);
-                            //dropGems.Add(_gems[i, j - 1]);
-                            //dropGems.Add(_gems[i, j - 2]);
+                            
                             Score += score3;
                         }
                     }
@@ -108,36 +130,7 @@ namespace Bejeweled
                 return CheckWin(gem);
             Console.WriteLine($"Score: {Score}");
 
-            FileIO fileio = new FileIO();
-            fileio.WriteScoreToFile(Score);
-
             return matchesFound;
-        }
-
-        void DropOneDown(IList<Gem> dropGems)
-        {
-            int current = 0;
-            for (int i = 7; i >= 0; i--) //rows
-            {
-                for (int j = 7; j >= 0; j--) //columns
-                {
-                    if (Gems[i, j].Equals(dropGems[current]))
-                    {
-                        try
-                        {
-                            Gems[i, j].Color = Gems[i - 1, j].Color;
-                            Gems[i - 1, j].SetNewColor(2);
-
-                        }
-                        catch (IndexOutOfRangeException)
-                        {
-                            Gems[i, j].SetNewColor(2);
-
-                            i++;
-                        }
-                    }
-                }
-            }
         }
     }
 }
